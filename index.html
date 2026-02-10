@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Для моей любимой 💝</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Добавляем библиотеку jsQR -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+</head>
+<body>
+    <!-- Плавающие сердечки в фоне -->
+    <div class="floating-heart">❤️</div>
+    <div class="floating-heart">💕</div>
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">💘</div>
+    <div class="floating-heart">💝</div>
+
+    <div class="container">
+        <!-- Приветственный экран -->
+        <div id="welcome-screen" class="screen active">
+            <h1>💕 Для моей любимой 💕</h1>
+            <p>С Днём Святого Валентина!</p>
+            <p>Найди QR-коды на наших подарках и сканируй их, чтобы открыть нашу историю...</p>
+            
+            <button id="start-btn" class="btn">Начать приключение</button>
+            
+            <!-- Карта прогресса -->
+            <div class="progress-map">
+                <div class="gift-item">
+                    <span class="gift-icon">🖼️</span>
+                    <span class="gift-name">Картина</span>
+                    <span class="status" data-gift="picture">🔒</span>
+                </div>
+                <div class="gift-item">
+                    <span class="gift-icon">🏮</span>
+                    <span class="gift-name">Фонарик</span>
+                    <span class="status" data-gift="lantern">🔒</span>
+                </div>
+                <div class="gift-item">
+                    <span class="gift-icon">🔋</span>
+                    <span class="gift-name">Часы</span>
+                    <span class="status" data-gift="watch">🔒</span>
+                </div>
+                <div class="gift-item">
+                    <span class="gift-icon">🍵</span>
+                    <span class="gift-name">Чай</span>
+                    <span class="status" data-gift="tea">🔒</span>
+                </div>
+                <div class="gift-item">
+                    <span class="gift-icon">🪟</span>
+                    <span class="gift-name">Окно</span>
+                    <span class="status" data-gift="window">🔒</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Экран сканирования -->
+        <div id="scanner-screen" class="screen">
+            <h2>📸 Сканируй QR-код</h2>
+            <div class="camera-container">
+                <video id="camera-feed"></video>
+                <canvas id="qr-canvas" style="display: none;"></canvas>
+            </div>
+            <p>Наведи камеру на QR-код подарка</p>
+            <div id="scan-status">Сканирование...</div>
+            <button id="back-btn" class="btn btn-secondary">Назад</button>
+        </div>
+
+        <!-- Экран игры (скрытый, будет показываться динамически) -->
+        <div id="game-screen" class="screen">
+            <div id="current-game"></div>
+        </div>
+    </div>
+
+    <!-- Подключаем модули в правильном порядке -->
+    <script src="js/games.js"></script>
+    <script src="js/scanner.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
