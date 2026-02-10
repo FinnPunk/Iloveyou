@@ -125,6 +125,10 @@ class ValentineGame {
     }
 
     startFinalGame() {
+        // Проверяем, не запущена ли уже финальная игра
+        if (this.finalGameStarted) return;
+        this.finalGameStarted = true;
+        
         // Показываем финальную игру
         this.showScreen('game-screen');
         
@@ -145,6 +149,9 @@ class ValentineGame {
             window: false
         };
         localStorage.removeItem('gameProgress');
+        
+        // Сбрасываем флаги
+        delete this.finalGameStarted;
         
         // Обновляем отображение
         this.updateProgressDisplay();
@@ -181,17 +188,24 @@ class ValentineGame {
         const allCompleted = Object.values(this.gameProgress).every(completed => completed);
         
         if (allCompleted) {
-            // Через 2 секунды запускаем финальную игру
-            setTimeout(() => {
-                this.showMessage('🎉 Поздравляю! Все игры пройдены! 🎉');
+            // Проверяем, не запущена ли уже финальная игра
+            if (!this.finalGameStarted) {
+                // Через 2 секунды запускаем финальную игру
                 setTimeout(() => {
-                    this.startFinalGame();
-                }, 2000);
-            }, 1000);
+                    this.showMessage('🎉 Поздравляю! Все игры пройдены! 🎉');
+                    setTimeout(() => {
+                        this.startFinalGame();
+                    }, 2000);
+                }, 1000);
+            }
         }
     }
 
     showMessage(text) {
+        // Проверяем, нет ли уже активного сообщения
+        const existingMessage = document.querySelector('.message-popup');
+        if (existingMessage) return;
+        
         // Создаем всплывающее сообщение
         const message = document.createElement('div');
         message.className = 'message-popup';
@@ -212,7 +226,9 @@ class ValentineGame {
         document.body.appendChild(message);
         
         setTimeout(() => {
-            message.remove();
+            if (message.parentNode) {
+                message.remove();
+            }
         }, 3000);
     }
 }

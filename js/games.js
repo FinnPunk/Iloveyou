@@ -77,7 +77,7 @@ class GameLogic {
                 <div style="font-size: 2rem;">🧽</div>
             </div>
             <div class="window-game-container">
-                <img id="robot-window" class="robot-window" src="images/robot.svg" alt="Робот" style="left: 50%; top: 50%;">
+                <img id="robot-window" class="robot-window" src="images/robot.svg" alt="Робот" style="left: 50%; top: 50%; display: none;">
             </div>
             <div class="game-stats">
                 <span>Чисто: <span id="cleaned-percent">0</span>%</span>
@@ -135,16 +135,27 @@ class GameLogic {
         const scoreElement = document.getElementById('score');
         const timeElement = document.getElementById('time');
 
-        // Создаём разные цвета сердечек
-        const heartColors = ['❤️', '😍', '💕', '💖', '💘', '💝', '💗', '💓', '💞', '💟'];
-        const correctColor = '❤️'; // Только красные нужно ловить
+        // Создаём разные смайлики, но с высоким шансом красных сердечек
+        const heartTypes = [
+            { emoji: '❤️', type: 'correct' }, // Красное сердце - правильный ответ
+            { emoji: '😍', type: 'wrong' },
+            { emoji: '💕', type: 'wrong' },
+            { emoji: '💖', type: 'wrong' },
+            { emoji: '❤️', type: 'correct' }, // Ещё одно красное
+            { emoji: '❤️', type: 'correct' }, // И ещё одно
+            { emoji: '❤️', type: 'correct' }, // Много красных!
+            { emoji: '💕', type: 'wrong' },
+            { emoji: '💖', type: 'wrong' },
+            { emoji: '❤️', type: 'correct' }
+        ];
 
         // Создаём сердечки
         const createHeart = () => {
+            const heartData = heartTypes[Math.floor(Math.random() * heartTypes.length)];
             const heart = document.createElement('div');
-            const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
-            heart.innerHTML = randomColor;
+            heart.innerHTML = heartData.emoji;
             heart.className = 'heart-game';
+            heart.dataset.type = heartData.type;
             heart.style.position = 'absolute';
             heart.style.fontSize = '2rem';
             heart.style.left = Math.random() * (heartsContainer.offsetWidth - 40) + 'px';
@@ -153,7 +164,7 @@ class GameLogic {
             heart.style.userSelect = 'none';
 
             heart.addEventListener('click', () => {
-                if (heart.innerHTML === correctColor && score < 10) {
+                if (heart.dataset.type === 'correct' && score < 10) {
                     score++;
                     scoreElement.textContent = score;
                     heart.classList.add('correct');
@@ -163,8 +174,8 @@ class GameLogic {
                             this.completeGame('picture');
                         }, 500);
                     }
-                } else if (heart.innerHTML !== correctColor) {
-                    // Неправильный цвет - убираем без очков
+                } else if (heart.dataset.type === 'wrong') {
+                    // Неправильный - убираем без очков
                     heart.classList.add('correct');
                 }
             });
@@ -270,7 +281,6 @@ class GameLogic {
         const attemptsElement = document.getElementById('attempts');
         
         let attempts = 6;
-        let currentLevel = 0;
         let successCount = 0;
 
         // Создаём 6 уровней сложности
@@ -390,8 +400,10 @@ class GameLogic {
         let cleanedPercent = 0;
         let robotX = container.offsetWidth / 2;
         let robotY = container.offsetHeight / 2;
+        let totalArea = container.offsetWidth * container.offsetHeight;
         
-        // Устанавливаем начальное положение робота
+        // Показываем робота
+        robot.style.display = 'block';
         robot.style.left = robotX + 'px';
         robot.style.top = robotY + 'px';
 
@@ -408,10 +420,16 @@ class GameLogic {
             cleanedAreas.push(area);
             
             // Обновляем процент очистки
-            cleanedPercent = Math.min(100, Math.floor((cleanedAreas.length * 40 * 40) / (container.offsetWidth * container.offsetHeight) * 100));
+            let totalCleaned = 0;
+            cleanedAreas.forEach(area => {
+                totalCleaned += 40 * 40; // Площадь каждой области
+            });
+            
+            cleanedPercent = Math.min(100, Math.floor((totalCleaned / totalArea) * 100));
             percentElement.textContent = cleanedPercent;
             
             if (cleanedPercent >= 90) {
+                // Убираем все обработчики, чтобы не вызывались лишние разы
                 setTimeout(() => {
                     this.completeGame('window');
                 }, 1000);
@@ -445,12 +463,13 @@ class GameLogic {
         container.addEventListener('touchstart', (e) => {
             isMoving = true;
             moveRobot(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault(); // Предотвращаем стандартное поведение
         });
 
         container.addEventListener('touchmove', (e) => {
             if (isMoving) {
-                e.preventDefault();
                 moveRobot(e.touches[0].clientX, e.touches[0].clientY);
+                e.preventDefault(); // Предотвращаем прокрутку
             }
         });
 
@@ -498,7 +517,7 @@ class GameLogic {
             const y = centerY + radius * Math.sin(angle);
             
             const petal = document.createElement('img');
-            petal.src = 'images/petal.svg';
+            petal.src = 'images/petal.svg'; // Убедимся, что путь правильный
             petal.alt = 'Лепесток';
             petal.className = 'petal';
             petal.style.left = x - 15 + 'px';
@@ -514,6 +533,12 @@ class GameLogic {
                     petalsLeftElement.textContent = petals - removedCount;
                     
                     if (removedCount >= petals) {
+                        // Убираем обработчики, чтобы не вызывались лишние разы
+                        const allPetals = document.querySelectorAll('.petal');
+                        allPetals.forEach(p => {
+                            p.removeEventListener('click', arguments.callee);
+                        });
+                        
                         setTimeout(() => {
                             this.showFinalMessage();
                         }, 500);
@@ -574,6 +599,10 @@ class GameLogic {
     }
 
     completeGame(gameType) {
+        // Проверяем, не была ли игра уже завершена
+        if (this.alreadyCompleted) return;
+        this.alreadyCompleted = true;
+        
         // Показываем сообщение о завершении
         const messages = {
             picture: 'Когда я подарил тебе картину, я знал, что ты изменишь мою жизнь. Спасибо за это!',
@@ -593,6 +622,8 @@ class GameLogic {
         // Возвращаемся на главный экран через 3 секунды
         setTimeout(() => {
             this.parent.showScreen('welcome-screen');
+            // Сбрасываем флаг завершения
+            delete this.alreadyCompleted;
         }, 3000);
     }
 }
