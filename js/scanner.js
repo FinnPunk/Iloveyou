@@ -17,7 +17,7 @@ class QRScanner {
                 video: { 
                     facingMode: 'environment',
                     width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    height: { ideal: 1280 } // Квадратный формат
                 } 
             });
             

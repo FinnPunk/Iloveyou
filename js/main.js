@@ -29,6 +29,36 @@ class ValentineGame {
 
         // Обновляем статусы
         this.updateProgressDisplay();
+        
+        // Инициализируем плавающие сердечки
+        this.initFloatingHearts();
+    }
+
+    initFloatingHearts() {
+        const container = document.getElementById('floating-hearts-container');
+        
+        // Создаём плавающие сердечки
+        const heartTypes = ['❤️', '💕', '💖', '💘', '💝', '💗', '💓', '💞', '💟'];
+        
+        setInterval(() => {
+            if (Math.random() > 0.7) { // 30% шанс создать сердечко
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart-bg';
+                heart.textContent = heartTypes[Math.floor(Math.random() * heartTypes.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                heart.style.animationDuration = (Math.random() * 10 + 5) + 's';
+                
+                container.appendChild(heart);
+                
+                // Удаляем сердечко после анимации
+                setTimeout(() => {
+                    if (heart.parentNode) {
+                        heart.remove();
+                    }
+                }, 15000);
+            }
+        }, 500);
     }
 
     showScreen(screenId) {

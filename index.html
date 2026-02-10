@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>Для моей любимой 💝</title>
     <link rel="stylesheet" href="css/style.css">
     <!-- Добавляем библиотеку jsQR -->
@@ -10,11 +10,7 @@
 </head>
 <body>
     <!-- Плавающие сердечки в фоне -->
-    <div class="floating-heart">❤️</div>
-    <div class="floating-heart">💕</div>
-    <div class="floating-heart">💖</div>
-    <div class="floating-heart">💘</div>
-    <div class="floating-heart">💝</div>
+    <div id="floating-hearts-container"></div>
 
     <div class="container">
         <!-- Приветственный экран -->
@@ -58,7 +54,7 @@
         <!-- Экран сканирования -->
         <div id="scanner-screen" class="screen">
             <h2>📸 Сканируй QR-код</h2>
-            <div class="camera-container">
+            <div class="camera-container-square">
                 <video id="camera-feed"></video>
                 <canvas id="qr-canvas" style="display: none;"></canvas>
             </div>

@@ -16,7 +16,6 @@ class GameLogic {
             <div id="hearts-container" style="position: relative; height: 300px; background: #f9f9f9; border-radius: 10px; overflow: hidden;">
                 <!-- Сердечки будут появляться здесь -->
             </div>
-            <button id="finish-picture" class="btn" style="margin-top: 15px;">Завершить игру</button>
         `;
     }
 
@@ -49,7 +48,9 @@ class GameLogic {
                     <div id="battery-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #27ae60, #2ecc71); transition: width 0.3s;"></div>
                 </div>
             </div>
-            <button id="charge-battery" class="btn" style="padding: 15px 30px; font-size: 1.2rem;">Заряжай!</button>
+            <div id="bolt-click-area" style="text-align: center; margin: 20px 0;">
+                <div id="bolt-icon" class="bolt-icon">⚡</div>
+            </div>
         `;
     }
 
@@ -60,17 +61,12 @@ class GameLogic {
                 <div style="font-size: 2rem;">🌡️</div>
             </div>
             <div class="game-stats">
-                <span>Попыток: <span id="attempts">3</span></span>
+                <span>Попыток: <span id="attempts">6</span></span>
             </div>
-            <div style="text-align: center; margin: 20px 0;">
-                <div id="thermometer" style="width: 30px; height: 200px; background: #ddd; border-radius: 15px; margin: 0 auto; position: relative; overflow: hidden;">
-                    <div id="temperature-level" style="position: absolute; bottom: 0; width: 100%; background: linear-gradient(to top, #3498db, #2980b9); height: 0%;"></div>
-                    <div id="temperature-pointer" style="position: absolute; top: 50%; width: 100%; height: 2px; background: red; z-index: 10;"></div>
-                    <div style="position: absolute; top: 25%; width: 100%; height: 2px; background: green;"></div> <!-- Зелёная зона -->
-                    <div style="position: absolute; top: 75%; width: 100%; height: 2px; background: green;"></div>
-                </div>
+            <div id="thermometers-container" style="margin: 20px 0;">
+                <!-- 6 термометров разной сложности -->
             </div>
-            <button id="click-temperature" class="btn">Нажми в нужный момент!</button>
+            <button id="start-tea-game" class="btn">Начать игру!</button>
         `;
     }
 
@@ -80,12 +76,13 @@ class GameLogic {
                 <h2>🪟 Помой окно!</h2>
                 <div style="font-size: 2rem;">🧽</div>
             </div>
-            <div id="window-container" style="width: 100%; height: 300px; background: #87CEEB; border-radius: 10px; position: relative; overflow: hidden;">
-                <!-- Грязные пятна будут здесь -->
+            <div class="window-game-container">
+                <img id="robot-window" class="robot-window" src="images/robot.svg" alt="Робот" style="left: 50%; top: 50%;">
             </div>
             <div class="game-stats">
-                <span>Чисто: <span id="cleaned-spots">0</span>/10</span>
+                <span>Чисто: <span id="cleaned-percent">0</span>%</span>
             </div>
+            <p>Проведи пальцем по экрану, чтобы управлять роботом</p>
         `;
     }
 
@@ -98,16 +95,13 @@ class GameLogic {
             <div class="game-stats">
                 <span>Осталось лепестков: <span id="petals-left">10</span></span>
             </div>
-            <div style="text-align: center; margin: 30px 0;">
-                <div id="daisy" style="position: relative; width: 200px; height: 200px; margin: 0 auto;">
-                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 4rem; z-index: 1;">🌸</div>
-                    <!-- Лепестки будут добавляться сюда -->
-                </div>
+            <div class="flower-container">
+                <img id="flower-center" src="images/flower.svg" alt="Цветок" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 80px; height: 80px;">
+                <div id="petals-container"></div>
             </div>
             <div id="result-message" style="margin: 20px 0; font-size: 1.5rem; font-weight: bold; color: #e74c3c; display: none;">
                 <!-- Результат появится здесь -->
             </div>
-            <button id="pull-petal" class="btn" style="padding: 15px 30px; font-size: 1.2rem; margin: 20px 0;">Сорвать лепесток</button>
             <div id="final-message" style="margin: 20px 0; display: none; background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px;">
                 <!-- Финальное признание -->
             </div>
@@ -141,27 +135,37 @@ class GameLogic {
         const scoreElement = document.getElementById('score');
         const timeElement = document.getElementById('time');
 
+        // Создаём разные цвета сердечек
+        const heartColors = ['❤️', '😍', '💕', '💖', '💘', '💝', '💗', '💓', '💞', '💟'];
+        const correctColor = '❤️'; // Только красные нужно ловить
+
         // Создаём сердечки
         const createHeart = () => {
             const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
+            const randomColor = heartColors[Math.floor(Math.random() * heartColors.length)];
+            heart.innerHTML = randomColor;
+            heart.className = 'heart-game';
             heart.style.position = 'absolute';
             heart.style.fontSize = '2rem';
             heart.style.left = Math.random() * (heartsContainer.offsetWidth - 40) + 'px';
             heart.style.top = Math.random() * (heartsContainer.offsetHeight - 40) + 'px';
-            heart.style.cursor = 'pointer';
             heart.style.zIndex = '10';
             heart.style.userSelect = 'none';
 
             heart.addEventListener('click', () => {
-                if (score < 10) {
+                if (heart.innerHTML === correctColor && score < 10) {
                     score++;
                     scoreElement.textContent = score;
-                    heart.remove();
+                    heart.classList.add('correct');
                     
                     if (score >= 10) {
-                        this.completeGame('picture');
+                        setTimeout(() => {
+                            this.completeGame('picture');
+                        }, 500);
                     }
+                } else if (heart.innerHTML !== correctColor) {
+                    // Неправильный цвет - убираем без очков
+                    heart.classList.add('correct');
                 }
             });
 
@@ -169,14 +173,14 @@ class GameLogic {
 
             // Удаляем сердечко через 2 секунды если не поймано
             setTimeout(() => {
-                if (heart.parentNode) {
+                if (heart.parentNode && !heart.classList.contains('correct')) {
                     heart.remove();
                 }
             }, 2000);
         };
 
-        // Создаём сердечки каждые 500ms
-        const heartInterval = setInterval(createHeart, 500);
+        // Создаём сердечки каждые 300ms (быстрее)
+        const heartInterval = setInterval(createHeart, 300);
 
         // Таймер
         const timer = setInterval(() => {
@@ -192,20 +196,11 @@ class GameLogic {
                 } else {
                     this.parent.showMessage('⏰ Время вышло! Попробуй снова.');
                     setTimeout(() => {
-                        this.parent.showScreen('scanner-screen');
+                        this.parent.showScreen('welcome-screen');
                     }, 2000);
                 }
             }
         }, 1000);
-
-        // Кнопка завершения (для тестирования)
-        document.getElementById('finish-picture').addEventListener('click', () => {
-            if (score >= 10) {
-                this.completeGame('picture');
-            } else {
-                this.parent.showMessage('Собери 10 сердечек!');
-            }
-        });
     }
 
     initLanternGame() {
@@ -215,17 +210,19 @@ class GameLogic {
 
         // Создаём 8 фонариков
         for (let i = 0; i < 8; i++) {
-            const lantern = document.createElement('div');
-            lantern.innerHTML = '🏮';
-            lantern.style.fontSize = '2rem';
+            const lantern = document.createElement('img');
+            lantern.src = 'images/lantern.svg';
+            lantern.alt = 'Фонарик';
+            lantern.className = 'lantern';
+            lantern.style.width = '50px';
+            lantern.style.height = '50px';
             lantern.style.cursor = 'pointer';
-            lantern.style.opacity = '0.5';
+            lantern.style.filter = 'brightness(0.5) saturate(0.5)';
             lantern.style.transition = 'all 0.3s ease';
             
             lantern.addEventListener('click', () => {
-                if (lantern.style.opacity !== '1') {
-                    lantern.style.opacity = '1';
-                    lantern.style.transform = 'scale(1.2)';
+                if (!lantern.classList.contains('active')) {
+                    lantern.classList.add('active');
                     litCount++;
                     countElement.textContent = litCount;
                     
@@ -245,14 +242,19 @@ class GameLogic {
         let charge = 0;
         const levelElement = document.getElementById('battery-level');
         const barElement = document.getElementById('battery-bar');
-        const button = document.getElementById('charge-battery');
+        const boltIcon = document.getElementById('bolt-icon');
 
-        button.addEventListener('click', () => {
+        boltIcon.addEventListener('click', () => {
+            boltIcon.classList.add('charging');
             charge += 2;
             if (charge > 100) charge = 100;
             
             levelElement.textContent = charge;
             barElement.style.width = charge + '%';
+            
+            setTimeout(() => {
+                boltIcon.classList.remove('charging');
+            }, 300);
             
             if (charge >= 100) {
                 setTimeout(() => {
@@ -263,205 +265,274 @@ class GameLogic {
     }
 
     initTeaGame() {
-        let attempts = 3;
-        let success = false;
+        const container = document.getElementById('thermometers-container');
+        const startBtn = document.getElementById('start-tea-game');
         const attemptsElement = document.getElementById('attempts');
-        const pointer = document.getElementById('temperature-pointer');
-        const button = document.getElementById('click-temperature');
+        
+        let attempts = 6;
+        let currentLevel = 0;
+        let successCount = 0;
 
-        // Анимация движения указателя
-        let direction = 1;
-        let position = 50; // Процент от высоты
+        // Создаём 6 уровней сложности
+        const levels = [
+            { target: 50, width: 60, label: "Очень легко" }, // Широкая зона
+            { target: 30, width: 40, label: "Легко" },
+            { target: 50, width: 30, label: "Средне" },
+            { target: 70, width: 25, label: "Сложно" },
+            { target: 25, width: 20, label: "Очень сложно" },
+            { target: 50, width: 15, label: "Эксперт" } // Очень узкая зона
+        ];
 
-        const movePointer = () => {
-            if (!success && attempts > 0) {
-                position += direction * 2;
-                
-                if (position >= 90) {
-                    direction = -1;
-                    position = 90;
-                } else if (position <= 10) {
-                    direction = 1;
-                    position = 10;
+        // Создаём термометры
+        levels.forEach((level, index) => {
+            const thermometerDiv = document.createElement('div');
+            thermometerDiv.innerHTML = `
+                <div style="margin: 10px 0; text-align: center;">
+                    <div style="margin-bottom: 5px; font-weight: bold;">${level.label}</div>
+                    <div class="thermometer-line">
+                        <div class="target-zone" style="left: ${level.target - level.width/2}%; width: ${level.width}%;"></div>
+                        <div class="temperature-pointer" style="left: 50%;"></div>
+                    </div>
+                    <div style="margin-top: 5px;">
+                        <button class="btn btn-tea-level" data-index="${index}">Нажми!</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(thermometerDiv);
+        });
+
+        // Анимация движения указателя для каждого уровня
+        const pointers = container.querySelectorAll('.temperature-pointer');
+        const levelButtons = container.querySelectorAll('.btn-tea-level');
+        
+        let animations = {};
+        
+        const animatePointer = (index) => {
+            let position = Math.random() * 100;
+            let direction = Math.random() > 0.5 ? 1 : -1;
+            
+            const movePointer = () => {
+                if (animations[index]) {
+                    position += direction * 2;
+                    
+                    if (position >= 100) {
+                        direction = -1;
+                        position = 100;
+                    } else if (position <= 0) {
+                        direction = 1;
+                        position = 0;
+                    }
+                    
+                    pointers[index].style.left = position + '%';
+                    
+                    requestAnimationFrame(movePointer);
                 }
-                
-                pointer.style.top = position + '%';
-                
-                requestAnimationFrame(movePointer);
-            }
+            };
+            
+            movePointer();
         };
 
-        movePointer();
+        // Запускаем анимации для всех уровней
+        pointers.forEach((_, index) => {
+            animations[index] = true;
+            animatePointer(index);
+        });
 
-        button.addEventListener('click', () => {
-            if (success || attempts <= 0) return;
-
-            // Проверяем, в зелёной ли зоне (между 25% и 75%)
-            if (position >= 25 && position <= 75) {
-                success = true;
-                this.completeGame('tea');
-            } else {
-                attempts--;
-                attemptsElement.textContent = attempts;
-                
-                if (attempts <= 0) {
-                    setTimeout(() => {
-                        this.parent.showMessage('❌ Попытки закончились! Попробуй снова.');
-                        setTimeout(() => {
-                            this.parent.showScreen('scanner-screen');
-                        }, 2000);
-                    }, 1000);
+        // Обработчик нажатий на уровни
+        levelButtons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                if (animations[index]) {
+                    const targetZone = btn.parentElement.previousElementSibling.querySelector('.target-zone');
+                    const targetLeft = parseFloat(targetZone.style.left);
+                    const targetWidth = parseFloat(targetZone.style.width);
+                    const currentPos = parseFloat(pointers[index].style.left);
+                    
+                    // Проверяем, в зелёной ли зоне
+                    if (currentPos >= targetLeft && currentPos <= (targetLeft + targetWidth)) {
+                        successCount++;
+                        btn.disabled = true;
+                        btn.textContent = '✅';
+                        btn.style.background = '#27ae60';
+                        
+                        // Останавливаем анимацию для этого уровня
+                        animations[index] = false;
+                        
+                        // Проверяем, все ли уровни пройдены
+                        if (successCount >= 6) {
+                            this.completeGame('tea');
+                        }
+                    } else {
+                        attempts--;
+                        attemptsElement.textContent = attempts;
+                        
+                        if (attempts <= 0) {
+                            this.parent.showMessage('❌ Попытки закончились! Попробуй снова.');
+                            setTimeout(() => {
+                                this.parent.showScreen('welcome-screen');
+                            }, 2000);
+                        }
+                    }
                 }
-            }
+            });
+        });
+
+        startBtn.addEventListener('click', () => {
+            startBtn.style.display = 'none';
         });
     }
 
     initWindowGame() {
-        let cleaned = 0;
-        const container = document.getElementById('window-container');
-        const countElement = document.getElementById('cleaned-spots');
-        const spots = [];
-
-        // Создаём 10 грязных пятен
-        for (let i = 0; i < 10; i++) {
-            const spot = document.createElement('div');
-            spot.style.position = 'absolute';
-            spot.style.width = '30px';
-            spot.style.height = '30px';
-            spot.style.backgroundColor = '#8B4513';
-            spot.style.borderRadius = '50%';
-            spot.style.left = Math.random() * (container.offsetWidth - 30) + 'px';
-            spot.style.top = Math.random() * (container.offsetHeight - 30) + 'px';
-            spot.style.cursor = 'pointer';
-            spot.style.zIndex = '5';
-
-            spot.addEventListener('click', () => {
-                if (spot.style.backgroundColor !== 'transparent') {
-                    spot.style.backgroundColor = 'transparent';
-                    spot.style.border = '2px solid transparent';
-                    cleaned++;
-                    countElement.textContent = cleaned;
-                    
-                    if (cleaned >= 10) {
-                        setTimeout(() => {
-                            this.completeGame('window');
-                        }, 1000);
-                    }
-                }
-            });
-
-            container.appendChild(spot);
-            spots.push(spot);
-        }
-    }
-
-    initFinalGame() {
-        const daisy = document.getElementById('daisy');
-        const petalsLeft = document.getElementById('petals-left');
-        const pullButton = document.getElementById('pull-petal');
-        const resultMessage = document.getElementById('result-message');
-        const finalMessage = document.getElementById('final-message');
+        const container = document.querySelector('.window-game-container');
+        const robot = document.getElementById('robot-window');
+        const percentElement = document.getElementById('cleaned-percent');
         
-        let petals = 10;
-        let loveCount = 0;
-        let hateCount = 0;
+        let cleanedAreas = [];
+        let cleanedPercent = 0;
+        let robotX = container.offsetWidth / 2;
+        let robotY = container.offsetHeight / 2;
         
-        // Создаём лепестки
-        this.createPetals(daisy, petals);
-        
-        pullButton.addEventListener('click', () => {
-            if (petals > 0) {
-                // Удаляем один лепесток
-                const petal = daisy.querySelector('.petal');
-                if (petal) {
-                    // Анимация исчезновения
-                    petal.style.animation = 'fadeOut 0.5s ease';
-                    setTimeout(() => {
-                        petal.remove();
-                        
-                        petals--;
-                        petalsLeft.textContent = petals;
-                        
-                        // Случайно определяем "любит" или "не любит"
-                        const isLove = Math.random() > 0.5;
-                        
-                        if (isLove) {
-                            loveCount++;
-                            resultMessage.textContent = 'ЛЮБИТ! ❤️';
-                        } else {
-                            hateCount++;
-                            resultMessage.textContent = 'НЕ ЛЮБИТ... 😢';
-                        }
-                        
-                        resultMessage.style.display = 'block';
-                        resultMessage.style.color = isLove ? '#27ae60' : '#e74c3c';
-                        
-                        // Через 1.5 секунды скрываем результат
-                        setTimeout(() => {
-                            resultMessage.style.display = 'none';
-                            
-                            if (petals === 0) {
-                                // Все лепестки сорваны - показываем финальное сообщение
-                                this.showFinalMessage(loveCount, hateCount);
-                            }
-                        }, 1500);
-                    }, 500);
-                }
+        // Устанавливаем начальное положение робота
+        robot.style.left = robotX + 'px';
+        robot.style.top = robotY + 'px';
+
+        // Функция для создания области очистки
+        const createCleanArea = (x, y) => {
+            const area = document.createElement('div');
+            area.className = 'cleaned-area';
+            area.style.left = (x - 20) + 'px';
+            area.style.top = (y - 20) + 'px';
+            area.style.width = '40px';
+            area.style.height = '40px';
+            area.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%)';
+            container.appendChild(area);
+            cleanedAreas.push(area);
+            
+            // Обновляем процент очистки
+            cleanedPercent = Math.min(100, Math.floor((cleanedAreas.length * 40 * 40) / (container.offsetWidth * container.offsetHeight) * 100));
+            percentElement.textContent = cleanedPercent;
+            
+            if (cleanedPercent >= 90) {
+                setTimeout(() => {
+                    this.completeGame('window');
+                }, 1000);
             }
+        };
+
+        // Обработчик движения
+        let isMoving = false;
+        
+        const moveRobot = (clientX, clientY) => {
+            const rect = container.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+            
+            robotX = Math.max(20, Math.min(container.offsetWidth - 20, x));
+            robotY = Math.max(20, Math.min(container.offsetHeight - 20, y));
+            
+            robot.style.left = robotX + 'px';
+            robot.style.top = robotY + 'px';
+            robot.classList.add('moving');
+            
+            // Создаём область очистки
+            createCleanArea(robotX, robotY);
+            
+            setTimeout(() => {
+                robot.classList.remove('moving');
+            }, 100);
+        };
+
+        // Touch events для мобильных устройств
+        container.addEventListener('touchstart', (e) => {
+            isMoving = true;
+            moveRobot(e.touches[0].clientX, e.touches[0].clientY);
+        });
+
+        container.addEventListener('touchmove', (e) => {
+            if (isMoving) {
+                e.preventDefault();
+                moveRobot(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        });
+
+        container.addEventListener('touchend', () => {
+            isMoving = false;
+        });
+
+        // Mouse events для десктопа
+        container.addEventListener('mousedown', (e) => {
+            isMoving = true;
+            moveRobot(e.clientX, e.clientY);
+        });
+
+        container.addEventListener('mousemove', (e) => {
+            if (isMoving) {
+                moveRobot(e.clientX, e.clientY);
+            }
+        });
+
+        container.addEventListener('mouseup', () => {
+            isMoving = false;
+        });
+
+        container.addEventListener('mouseleave', () => {
+            isMoving = false;
         });
     }
 
-    createPetals(container, count) {
+    initFinalGame() {
+        const petalsContainer = document.getElementById('petals-container');
+        const petalsLeftElement = document.getElementById('petals-left');
+        const resultMessage = document.getElementById('result-message');
+        
+        let petals = 10;
+        let removedCount = 0;
+        
+        // Создаём лепестки по кругу
         const centerX = 100;
         const centerY = 100;
         const radius = 80;
         
-        for (let i = 0; i < count; i++) {
-            const angle = (i / count) * 2 * Math.PI;
+        for (let i = 0; i < petals; i++) {
+            const angle = (i / petals) * 2 * Math.PI;
             const x = centerX + radius * Math.cos(angle);
             const y = centerY + radius * Math.sin(angle);
             
-            const petal = document.createElement('div');
+            const petal = document.createElement('img');
+            petal.src = 'images/petal.svg';
+            petal.alt = 'Лепесток';
             petal.className = 'petal';
-            petal.innerHTML = '瓣';
-            petal.style.position = 'absolute';
-            petal.style.left = x - 10 + 'px';
-            petal.style.top = y - 10 + 'px';
-            petal.style.fontSize = '1.5rem';
-            petal.style.cursor = 'pointer';
-            petal.style.zIndex = '2';
-            petal.style.userSelect = 'none';
-            petal.style.transition = 'transform 0.3s ease';
+            petal.style.left = x - 15 + 'px';
+            petal.style.top = y - 15 + 'px';
+            petal.style.width = '30px';
+            petal.style.height = '30px';
+            petal.style.transform = `rotate(${angle * 180 / Math.PI + 90}deg)`;
             
-            petal.addEventListener('mouseover', () => {
-                petal.style.transform = 'scale(1.2)';
+            petal.addEventListener('click', () => {
+                if (!petal.classList.contains('removing')) {
+                    petal.classList.add('removing');
+                    removedCount++;
+                    petalsLeftElement.textContent = petals - removedCount;
+                    
+                    if (removedCount >= petals) {
+                        setTimeout(() => {
+                            this.showFinalMessage();
+                        }, 500);
+                    }
+                }
             });
             
-            petal.addEventListener('mouseout', () => {
-                petal.style.transform = 'scale(1)';
-            });
-            
-            container.appendChild(petal);
+            petalsContainer.appendChild(petal);
         }
     }
 
-    showFinalMessage(loveCount, hateCount) {
-        const pullButton = document.getElementById('pull-petal');
+    showFinalMessage() {
         const finalMessage = document.getElementById('final-message');
         const resultMessage = document.getElementById('result-message');
-        
-        // Скрываем кнопку
-        pullButton.style.display = 'none';
         
         // Показываем результат
         resultMessage.style.display = 'block';
         resultMessage.style.color = '#e74c3c';
-        
-        if (loveCount >= hateCount) {
-            resultMessage.innerHTML = 'ЛЮБИТ! ❤️<br><span style="font-size: 1rem;">(и даже больше, чем ты думаешь)</span>';
-        } else {
-            resultMessage.innerHTML = 'ВСЁ РАВНО ЛЮБИТ! ❤️<br><span style="font-size: 1rem;">(потому что это игра)</span>';
-        }
+        resultMessage.innerHTML = 'ЛЮБИТ! ❤️<br><span style="font-size: 1rem;">(и даже больше, чем ты думаешь)</span>';
         
         // Анимация появления результата
         resultMessage.style.animation = 'pulse 0.5s ease';
@@ -519,9 +590,9 @@ class GameLogic {
             alert(messages[gameType]);
         }, 1500);
 
-        // Возвращаемся к сканеру через 3 секунды
+        // Возвращаемся на главный экран через 3 секунды
         setTimeout(() => {
-            this.parent.showScreen('scanner-screen');
+            this.parent.showScreen('welcome-screen');
         }, 3000);
     }
 }
