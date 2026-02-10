@@ -13,7 +13,7 @@ class GameLogic {
                 <span>Счёт: <span id="score">0</span>/10</span>
                 <span>Время: <span id="time">30</span>s</span>
             </div>
-            <div id="hearts-container" style="position: relative; height: 300px; background: #f9f9f9; border-radius: 10px; overflow: hidden;">
+            <div id="hearts-container" style="position: relative; height: 300px; background: rgba(128, 128, 128, 0.2); border-radius: 10px; overflow: hidden;">
                 <!-- Сердечки будут появляться здесь -->
             </div>
         `;
@@ -43,7 +43,7 @@ class GameLogic {
             <div class="game-stats">
                 <span>Заряд: <span id="battery-level">0</span>%</span>
             </div>
-            <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <div style="background: rgba(128, 128, 128, 0.2); padding: 20px; border-radius: 10px; margin: 20px 0;">
                 <div style="width: 100%; height: 30px; background: #ddd; border-radius: 15px; overflow: hidden;">
                     <div id="battery-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #27ae60, #2ecc71); transition: width 0.3s;"></div>
                 </div>
@@ -77,8 +77,8 @@ class GameLogic {
                 <div style="font-size: 2rem;">🧽</div>
             </div>
             <div class="window-game-container">
-                <!-- Встроенный SVG-робот -->
-                <svg id="robot-window" class="robot-window" width="100" height="200" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" style="left: 50%; top: 50%; display: none; position: absolute;">
+                <!-- Встроенный SVG-робот (увеличен в 2 раза) -->
+                <svg id="robot-window" class="robot-window" width="200" height="400" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" style="left: 50%; top: 50%; display: none; position: absolute; transform: scale(2); transform-origin: center;">
                   <!-- Корпус робота -->
                   <path d="
                     M 10 20 
@@ -518,19 +518,23 @@ class GameLogic {
         let robotY = container.offsetHeight / 2;
         let totalArea = container.offsetWidth * container.offsetHeight;
         
-        // Показываем робота
+        // Показываем робота (увеличенный)
         robot.style.display = 'block';
-        robot.style.left = robotX + 'px';
-        robot.style.top = robotY + 'px';
+        robot.style.left = (robotX - 50) + 'px'; // центрируем
+        robot.style.top = (robotY - 100) + 'px'; // центрируем
+        
+        // Увеличиваем порог очистки до 90% и увеличиваем размер области очистки
+        const cleanRadius = 60; // увеличенный радиус очистки
+        const requiredCleanPercent = 90; // порог
 
         // Функция для создания области очистки
         const createCleanArea = (x, y) => {
             const area = document.createElement('div');
             area.className = 'cleaned-area';
-            area.style.left = (x - 20) + 'px';
-            area.style.top = (y - 20) + 'px';
-            area.style.width = '40px';
-            area.style.height = '40px';
+            area.style.left = (x - cleanRadius/2) + 'px';
+            area.style.top = (y - cleanRadius/2) + 'px';
+            area.style.width = cleanRadius + 'px';
+            area.style.height = cleanRadius + 'px';
             area.style.background = 'linear-gradient(135deg, #ffffff 0%, #f0f8ff 100%)';
             container.appendChild(area);
             cleanedAreas.push(area);
@@ -538,14 +542,13 @@ class GameLogic {
             // Обновляем процент очистки
             let totalCleaned = 0;
             cleanedAreas.forEach(area => {
-                totalCleaned += 40 * 40; // Площадь каждой области
+                totalCleaned += cleanRadius * cleanRadius; // площадь каждой области
             });
             
             cleanedPercent = Math.min(100, Math.floor((totalCleaned / totalArea) * 100));
             percentElement.textContent = cleanedPercent;
             
-            if (cleanedPercent >= 90) {
-                // Убираем все обработчики, чтобы не вызывались лишние разы
+            if (cleanedPercent >= requiredCleanPercent) {
                 setTimeout(() => {
                     this.completeGame('window');
                 }, 1000);
@@ -560,11 +563,11 @@ class GameLogic {
             const x = clientX - rect.left;
             const y = clientY - rect.top;
             
-            robotX = Math.max(20, Math.min(container.offsetWidth - 20, x));
-            robotY = Math.max(20, Math.min(container.offsetHeight - 20, y));
+            robotX = Math.max(50, Math.min(container.offsetWidth - 50, x)); // учитываем размер робота
+            robotY = Math.max(100, Math.min(container.offsetHeight - 100, y)); // учитываем размер робота
             
-            robot.style.left = robotX + 'px';
-            robot.style.top = robotY + 'px';
+            robot.style.left = (robotX - 50) + 'px'; // центрируем
+            robot.style.top = (robotY - 100) + 'px'; // центрируем
             robot.classList.add('moving');
             
             // Создаём область очистки
@@ -579,13 +582,13 @@ class GameLogic {
         container.addEventListener('touchstart', (e) => {
             isMoving = true;
             moveRobot(e.touches[0].clientX, e.touches[0].clientY);
-            e.preventDefault(); // Предотвращаем стандартное поведение
+            e.preventDefault();
         });
 
         container.addEventListener('touchmove', (e) => {
             if (isMoving) {
                 moveRobot(e.touches[0].clientX, e.touches[0].clientY);
-                e.preventDefault(); // Предотвращаем прокрутку
+                e.preventDefault();
             }
         });
 
@@ -622,15 +625,17 @@ class GameLogic {
         let petals = 10;
         let removedCount = 0;
         
-        // Создаём лепестки по кругу как SVG (из присланного изображения)
+        // Создаём лепестки по кругу (как на нормальных цветках)
         const centerX = 100;
         const centerY = 100;
-        const radius = 80;
+        const radius = 80; // расстояние от центра до основания лепестка
         
         for (let i = 0; i < petals; i++) {
-            const angle = (i / petals) * 2 * Math.PI;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
+            const angle = (i / petals) * 2 * Math.PI; // равномерное распределение
+            const baseX = centerX + radius * Math.cos(angle); // основание лепестка у цветка
+            const baseY = centerY + radius * Math.sin(angle);
+            const tipX = centerX + (radius + 60) * Math.cos(angle); // кончик лепестка дальше
+            const tipY = centerY + (radius + 60) * Math.sin(angle);
             
             // Создаём SVG-элемент лепестка
             const petal = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -639,18 +644,18 @@ class GameLogic {
             petal.setAttribute('viewBox', '0 0 60 120');
             petal.setAttribute('class', 'petal');
             petal.style.position = 'absolute';
-            petal.style.left = x - 30 + 'px';
-            petal.style.top = y - 60 + 'px';
+            petal.style.left = baseX - 30 + 'px';
+            petal.style.top = baseY - 60 + 'px';
             petal.style.cursor = 'pointer';
-            petal.style.transform = `rotate(${angle * 180 / Math.PI}deg)`;
-            petal.style.transformOrigin = `${x}px ${y}px`;
+            petal.style.transform = `rotate(${angle * 180 / Math.PI}deg)`; // поворачиваем лепесток
+            petal.style.transformOrigin = '30px 60px'; // вращаем относительно центра лепестка
             
-            // Вставляем точный SVG-код лепестка
+            // Вставляем точный SVG-код лепестка (ориентирован правильно)
             petal.innerHTML = `
               <path d="
-                M 30 5 
-                C 45 20, 55 50, 30 90 
-                C 5 50, 15 20, 30 5
+                M 30 60 
+                C 45 30, 55 0, 30 0 
+                C 5 0, 15 30, 30 60
               " fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
             `;
 

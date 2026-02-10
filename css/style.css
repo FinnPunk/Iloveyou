@@ -252,23 +252,25 @@ p {
 
 /* Стили для игр */
 #current-game {
-    background: rgba(255,255,255,0.9);
+    background: rgba(128, 128, 128, 0.3); /* притускленный серый */
+    backdrop-filter: blur(10px); /* эффект стекла */
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
     min-height: 400px;
-    backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.3);
+    color: #000; /* черный текст */
 }
 
 .game-title {
     text-align: center;
-    color: #e74c3c;
+    color: #000; /* черный */
     margin-bottom: 20px;
 }
 
 .game-content {
     text-align: center;
+    color: #000; /* черный */
 }
 
 .game-stats {
@@ -276,7 +278,7 @@ p {
     justify-content: space-around;
     margin-bottom: 20px;
     font-weight: bold;
-    color: #333;
+    color: #000; /* черный */
 }
 
 .heart {

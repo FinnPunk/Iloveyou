@@ -78,6 +78,12 @@ class ValentineGame {
     }
 
     startGame(gameType) {
+        // Проверяем, не пройдена ли игра уже
+        if (this.gameProgress[gameType]) {
+            this.showMessage('❌ Эта игра уже пройдена!');
+            return;
+        }
+        
         // Сохраняем прогресс
         this.gameProgress[gameType] = true;
         localStorage.setItem('gameProgress', JSON.stringify(this.gameProgress));
