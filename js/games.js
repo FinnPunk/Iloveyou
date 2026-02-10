@@ -77,7 +77,7 @@ class GameLogic {
                 <div style="font-size: 2rem;">🧽</div>
             </div>
             <div class="window-game-container">
-                <img id="robot-window" class="robot-window" src="images/robot.svg" alt="Робот" style="left: 50%; top: 50%; display: none;">
+                <img id="robot-window" class="robot-window" src="images/robot.png" alt="Робот" style="left: 50%; top: 50%; display: none;">
             </div>
             <div class="game-stats">
                 <span>Чисто: <span id="cleaned-percent">0</span>%</span>
@@ -96,7 +96,7 @@ class GameLogic {
                 <span>Осталось лепестков: <span id="petals-left">10</span></span>
             </div>
             <div class="flower-container">
-                <img id="flower-center" src="images/flower.svg" alt="Цветок" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 80px; height: 80px;">
+                <img id="flower-center" src="images/flower.png" alt="Цветок" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 80px; height: 80px;">
                 <div id="petals-container"></div>
             </div>
             <div id="result-message" style="margin: 20px 0; font-size: 1.5rem; font-weight: bold; color: #e74c3c; display: none;">
@@ -222,7 +222,7 @@ class GameLogic {
         // Создаём 8 фонариков
         for (let i = 0; i < 8; i++) {
             const lantern = document.createElement('img');
-            lantern.src = 'images/lantern.svg';
+            lantern.src = 'images/lantern.png';
             lantern.alt = 'Фонарик';
             lantern.className = 'lantern';
             lantern.style.width = '50px';
@@ -517,7 +517,7 @@ class GameLogic {
             const y = centerY + radius * Math.sin(angle);
             
             const petal = document.createElement('img');
-            petal.src = 'images/petal.svg'; // Убедимся, что путь правильный
+            petal.src = 'images/petal.png'; // Теперь PNG
             petal.alt = 'Лепесток';
             petal.className = 'petal';
             petal.style.left = x - 15 + 'px';
