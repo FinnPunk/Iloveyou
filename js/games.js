@@ -77,7 +77,50 @@ class GameLogic {
                 <div style="font-size: 2rem;">🧽</div>
             </div>
             <div class="window-game-container">
-                <img id="robot-window" class="robot-window" src="images/robot.png" alt="Робот" style="left: 50%; top: 50%; display: none;">
+                <!-- Встроенный SVG-робот -->
+                <svg id="robot-window" class="robot-window" width="100" height="200" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg" style="left: 50%; top: 50%; display: none; position: absolute;">
+                  <!-- Корпус робота -->
+                  <path d="
+                    M 10 20 
+                    C 5 30, 5 170, 10 180 
+                    L 90 180 
+                    C 95 170, 95 30, 90 20 
+                    Z
+                  " fill="#F3F4F6" stroke="#D1D5DB" stroke-width="2"/>
+                  
+                  <!-- Верхняя панель -->
+                  <path d="
+                    M 25 10 
+                    L 75 10 
+                    L 75 30 
+                    L 25 30 
+                    Z
+                  " fill="#1F2937" stroke="#111827" stroke-width="1"/>
+                  
+                  <!-- Дисплей -->
+                  <rect x="30" y="15" width="40" height="10" rx="2" fill="#0F172A"/>
+                  
+                  <!-- Индикаторы -->
+                  <circle cx="40" cy="20" r="4" fill="#8B5CF6"/> <!-- Фиолетовый -->
+                  <circle cx="50" cy="20" r="4" fill="#EF4444"/> <!-- Красный -->
+                  <circle cx="60" cy="20" r="4" fill="#F59E0B"/> <!-- Жёлтый -->
+                  
+                  <!-- Центральный дисплей -->
+                  <circle cx="50" cy="80" r="30" fill="#1F2937" stroke="#374151" stroke-width="2"/>
+                  <text x="50" y="84" font-size="8" fill="#F3F4F6" text-anchor="middle" font-family="monospace">LOAD</text>
+                  
+                  <!-- Ручка слева -->
+                  <rect x="5" y="50" width="15" height="20" rx="3" fill="#6B7280"/>
+                  <circle cx="12" cy="60" r="5" fill="#374151"/>
+                  
+                  <!-- Нижняя кнопка -->
+                  <circle cx="50" cy="150" r="12" fill="#F3F4F6" stroke="#D1D5DB" stroke-width="2"/>
+                  <circle cx="50" cy="150" r="6" fill="#1F2937"/>
+                  
+                  <!-- Ножки -->
+                  <rect x="30" y="185" width="10" height="15" rx="2" fill="#9CA3AF"/>
+                  <rect x="60" y="185" width="10" height="15" rx="2" fill="#9CA3AF"/>
+                </svg>
             </div>
             <div class="game-stats">
                 <span>Чисто: <span id="cleaned-percent">0</span>%</span>
@@ -96,7 +139,10 @@ class GameLogic {
                 <span>Осталось лепестков: <span id="petals-left">10</span></span>
             </div>
             <div class="flower-container">
-                <img id="flower-center" src="images/flower.png" alt="Цветок" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; width: 80px; height: 80px;">
+                <!-- Встроенный SVG-цветок -->
+                <svg id="flower-center" width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;">
+                  <circle cx="40" cy="40" r="38" fill="#FACC15" stroke="#EAB308" stroke-width="2"/>
+                </svg>
                 <div id="petals-container"></div>
             </div>
             <div id="result-message" style="margin: 20px 0; font-size: 1.5rem; font-weight: bold; color: #e74c3c; display: none;">
@@ -219,18 +265,88 @@ class GameLogic {
         const container = document.getElementById('lanterns-container');
         const countElement = document.getElementById('lit-lanterns');
 
-        // Создаём 8 фонариков
+        // Создаём 8 фонариков как SVG (точные изображения из присланных)
         for (let i = 0; i < 8; i++) {
-            const lantern = document.createElement('img');
-            lantern.src = 'images/lantern.png';
-            lantern.alt = 'Фонарик';
-            lantern.className = 'lantern';
-            lantern.style.width = '50px';
-            lantern.style.height = '50px';
+            const lantern = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            lantern.setAttribute('width', '120');
+            lantern.setAttribute('height', '200');
+            lantern.setAttribute('viewBox', '0 0 120 200');
+            lantern.setAttribute('class', 'lantern');
             lantern.style.cursor = 'pointer';
             lantern.style.filter = 'brightness(0.5) saturate(0.5)';
             lantern.style.transition = 'all 0.3s ease';
-            
+            lantern.style.width = '50px';
+            lantern.style.height = 'auto';
+
+            // Вставляем точный SVG-код изображения
+            lantern.innerHTML = `
+              <!-- Крышка -->
+              <rect x="45" y="0" width="30" height="15" fill="#F59E0B"/>
+              
+              <!-- Тело фонарика (красное с сеткой) -->
+              <ellipse cx="60" cy="70" rx="55" ry="60" fill="#EF4444"/>
+              
+              <!-- Сетка (горизонтальные линии) -->
+              <g stroke="#DC2626" stroke-width="1">
+                <line x1="10" y1="30" x2="110" y2="30"/>
+                <line x1="10" y1="40" x2="110" y2="40"/>
+                <line x1="10" y1="50" x2="110" y2="50"/>
+                <line x1="10" y1="60" x2="110" y2="60"/>
+                <line x1="10" y1="70" x2="110" y2="70"/>
+                <line x1="10" y1="80" x2="110" y2="80"/>
+                <line x1="10" y1="90" x2="110" y2="90"/>
+                <line x1="10" y1="100" x2="110" y2="100"/>
+                <line x1="10" y1="110" x2="110" y2="110"/>
+              </g>
+              
+              <!-- Сетка (вертикальные линии) -->
+              <g stroke="#DC2626" stroke-width="1">
+                <line x1="20" y1="20" x2="20" y2="120"/>
+                <line x1="30" y1="20" x2="30" y2="120"/>
+                <line x1="40" y1="20" x2="40" y2="120"/>
+                <line x1="50" y1="20" x2="50" y2="120"/>
+                <line x1="60" y1="20" x2="60" y2="120"/>
+                <line x1="70" y1="20" x2="70" y2="120"/>
+                <line x1="80" y1="20" x2="80" y2="120"/>
+                <line x1="90" y1="20" x2="90" y2="120"/>
+                <line x1="100" y1="20" x2="100" y2="120"/>
+              </g>
+              
+              <!-- Золотая нижняя часть (узор) -->
+              <path d="
+                M 15 120 
+                Q 30 110, 45 120 
+                Q 60 130, 75 120 
+                Q 90 110, 105 120 
+                L 105 125 
+                L 15 125 Z
+              " fill="#F59E0B" stroke="#D97706" stroke-width="1"/>
+              
+              <!-- Кисточка (золотые нити) -->
+              <g fill="#F59E0B">
+                <rect x="55" y="125" width="10" height="40" rx="2"/>
+                <rect x="57" y="125" width="2" height="40" fill="#D97706"/>
+                <rect x="59" y="125" width="2" height="40" fill="#D97706"/>
+                <rect x="61" y="125" width="2" height="40" fill="#D97706"/>
+                <rect x="63" y="125" width="2" height="40" fill="#D97706"/>
+                <rect x="65" y="125" width="2" height="40" fill="#D97706"/>
+              </g>
+              
+              <!-- Подвеска (зелёный шарик) -->
+              <circle cx="60" cy="170" r="8" fill="#16A34A"/>
+              
+              <!-- Нижняя кисточка (длинная) -->
+              <g fill="#F59E0B">
+                <rect x="52" y="175" width="16" height="60" rx="2"/>
+                <rect x="54" y="175" width="2" height="60" fill="#D97706"/>
+                <rect x="56" y="175" width="2" height="60" fill="#D97706"/>
+                <rect x="58" y="175" width="2" height="60" fill="#D97706"/>
+                <rect x="60" y="175" width="2" height="60" fill="#D97706"/>
+                <rect x="62" y="175" width="2" height="60" fill="#D97706"/>
+                <rect x="64" y="175" width="2" height="60" fill="#D97706"/>
+              </g>
+            `;
+
             lantern.addEventListener('click', () => {
                 if (!lantern.classList.contains('active')) {
                     lantern.classList.add('active');
@@ -506,7 +622,7 @@ class GameLogic {
         let petals = 10;
         let removedCount = 0;
         
-        // Создаём лепестки по кругу
+        // Создаём лепестки по кругу как SVG (из присланного изображения)
         const centerX = 100;
         const centerY = 100;
         const radius = 80;
@@ -516,16 +632,28 @@ class GameLogic {
             const x = centerX + radius * Math.cos(angle);
             const y = centerY + radius * Math.sin(angle);
             
-            const petal = document.createElement('img');
-            petal.src = 'images/petal.png'; // Теперь PNG
-            petal.alt = 'Лепесток';
-            petal.className = 'petal';
-            petal.style.left = x - 15 + 'px';
-            petal.style.top = y - 15 + 'px';
-            petal.style.width = '30px';
-            petal.style.height = '30px';
-            petal.style.transform = `rotate(${angle * 180 / Math.PI + 90}deg)`;
+            // Создаём SVG-элемент лепестка
+            const petal = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            petal.setAttribute('width', '60');
+            petal.setAttribute('height', '120');
+            petal.setAttribute('viewBox', '0 0 60 120');
+            petal.setAttribute('class', 'petal');
+            petal.style.position = 'absolute';
+            petal.style.left = x - 30 + 'px';
+            petal.style.top = y - 60 + 'px';
+            petal.style.cursor = 'pointer';
+            petal.style.transform = `rotate(${angle * 180 / Math.PI}deg)`;
+            petal.style.transformOrigin = `${x}px ${y}px`;
             
+            // Вставляем точный SVG-код лепестка
+            petal.innerHTML = `
+              <path d="
+                M 30 5 
+                C 45 20, 55 50, 30 90 
+                C 5 50, 15 20, 30 5
+              " fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+            `;
+
             petal.addEventListener('click', () => {
                 if (!petal.classList.contains('removing')) {
                     petal.classList.add('removing');
