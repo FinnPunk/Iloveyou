@@ -631,42 +631,32 @@ class GameLogic {
         const centerX = 100;   // центр цветка
         const centerY = 100;
         const radius = 50;    // расстояние от центра до основания лепестка
-        const petalLength = 40; // длина лепестка от основания до кончика
+        const petalSize = 25; // радиус круглого лепестка
 
         // Создаём 10 лепестков по окружности (как на фото)
         for (let i = 0; i < petals; i++) {
             const angle = (i / petals) * 2 * Math.PI; // угол в радианах (0, 36°, 72°, ...)
             
-            // Координаты основания лепестка (прикреплены к центру)
-            const baseX = centerX + radius * Math.cos(angle);
-            const baseY = centerY + radius * Math.sin(angle);
+            // Координаты центра круглого лепестка
+            const petalX = centerX + (radius + petalSize) * Math.cos(angle);
+            const petalY = centerY + (radius + petalSize) * Math.sin(angle);
             
-            // Координаты кончика лепестка (внешний край)
-            const tipX = centerX + (radius + petalLength) * Math.cos(angle);
-            const tipY = centerY + (radius + petalLength) * Math.sin(angle);
-            
-            // Создаём SVG-элемент лепестка
+            // Создаём SVG-элемент круглого лепестка
             const petal = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            petal.setAttribute('width', '80');
-            petal.setAttribute('height', '80');
-            petal.setAttribute('viewBox', '0 0 80 80');
+            petal.setAttribute('width', '50');
+            petal.setAttribute('height', '50');
+            petal.setAttribute('viewBox', '0 0 50 50');
             petal.setAttribute('class', 'petal');
             petal.style.position = 'absolute';
-            petal.style.left = (baseX - 40) + 'px'; // центрируем относительно основания
-            petal.style.top = (baseY - 40) + 'px';
+            petal.style.left = (petalX - 25) + 'px'; // центрируем относительно основания
+            petal.style.top = (petalY - 25) + 'px';
             petal.style.cursor = 'pointer';
             petal.style.transform = `rotate(${angle * 180 / Math.PI}deg)`; // поворачиваем лепесток
-            petal.style.transformOrigin = '40px 40px'; // вращаем вокруг центра лепестка
+            petal.style.transformOrigin = '25px 25px'; // вращаем вокруг центра лепестка
             
-            // SVG-путь для каплевидного лепестка (как на фото)
-            const pathData = `
-                M 40 40 
-                C 50 20, 60 10, 70 30 
-                C 60 50, 50 60, 40 40
-            `;
-            
+            // Круглый лепесток
             petal.innerHTML = `
-                <path d="${pathData}" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+                <circle cx="25" cy="25" r="20" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="2"/>
             `;
 
             petal.addEventListener('click', () => {
@@ -675,9 +665,9 @@ class GameLogic {
                     removedCount++;
                     petalsLeftElement.textContent = petals - removedCount;
                     
-                    // Показываем текущее сообщение
+                    // Показываем текущее сообщение (оно остается)
                     resultMessage.style.display = 'block';
-                    resultMessage.style.color = '#e74c3c';
+                    resultMessage.style.color = '#000'; // черный текст
                     resultMessage.innerHTML = `<strong>${currentMessage.toUpperCase()}!</strong>`;
                     
                     // Меняем сообщение на следующий клик
@@ -700,11 +690,6 @@ class GameLogic {
                         allPetals.forEach(p => {
                             p.removeEventListener('click', arguments.callee);
                         });
-                    } else {
-                        // Скрываем сообщение через 1.5 секунды
-                        setTimeout(() => {
-                            resultMessage.style.display = 'none';
-                        }, 1500);
                     }
                 }
             });
@@ -741,9 +726,9 @@ class GameLogic {
         setTimeout(() => {
             finalMessage.innerHTML = `
                 <h3>💕 Мое признание 💕</h3>
-                <p>${loveMessages[Math.floor(Math.random() * loveMessages.length)]}</p>
-                <p>С Днём Святого Валентина, моя любовь! ❤️</p>
-                <p>Пусть эта игра напомнит тебе, как сильно я тебя люблю.</p>
+                <p style="color: #000;">${loveMessages[Math.floor(Math.random() * loveMessages.length)]}</p>
+                <p style="color: #000;">С Днём Святого Валентина, моя любовь! ❤️</p>
+                <p style="color: #000;">Пусть эта игра напомнит тебе, как сильно я тебя люблю.</p>
                 <div style="margin: 20px 0; animation: float 3s ease-in-out infinite;">
                     <div style="font-size: 2rem;">💖💖💖</div>
                 </div>
