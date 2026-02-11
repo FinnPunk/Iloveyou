@@ -131,10 +131,6 @@ class ValentineGame {
     }
 
     startFinalGame() {
-        // Проверяем, не запущена ли уже финальная игра
-        if (this.finalGameStarted) return;
-        this.finalGameStarted = true;
-        
         // Показываем финальную игру
         this.showScreen('game-screen');
         
@@ -156,9 +152,6 @@ class ValentineGame {
         };
         localStorage.removeItem('gameProgress');
         
-        // Сбрасываем флаги
-        delete this.finalGameStarted;
-        
         // Обновляем отображение
         this.updateProgressDisplay();
         
@@ -178,32 +171,50 @@ class ValentineGame {
     }
 
     updateProgressDisplay() {
-        Object.keys(this.gameProgress).forEach(gift => {
-            const statusElement = document.querySelector(`.status[data-gift="${gift}"]`);
-            if (this.gameProgress[gift]) {
-                statusElement.textContent = '✅';
-                statusElement.style.color = '#27ae60';
-            } else {
-                statusElement.textContent = '🔒';
-                statusElement.style.color = '#95a5a6';
-            }
-        });
+        const progressMap = document.querySelector('.progress-map');
+        
+        // Проверяем, все ли игры пройдены
+        const allCompleted = Object.values(this.gameProgress).every(completed => completed);
+        
+        if (allCompleted) {
+            // Показываем только одну кнопку "Любит - не любит"
+            progressMap.innerHTML = `
+                <button id="start-final-game" class="btn" style="margin: 20px auto; display: block; font-size: 1.2rem;">
+                    🌼 Запустить "Любит - не любит"
+                </button>
+            `;
+            
+            document.getElementById('start-final-game').addEventListener('click', () => {
+                this.startFinalGame();
+            });
+        } else {
+            // Показываем обычную карту прогресса
+            progressMap.innerHTML = `
+                <div class="gift-item">
+                    <span class="status" data-gift="picture">${this.gameProgress.picture ? '✅' : '🔒'}</span>
+                </div>
+                <div class="gift-item">
+                    <span class="status" data-gift="lantern">${this.gameProgress.lantern ? '✅' : '🔒'}</span>
+                </div>
+                <div class="gift-item">
+                    <span class="status" data-gift="watch">${this.gameProgress.watch ? '✅' : '🔒'}</span>
+                </div>
+                <div class="gift-item">
+                    <span class="status" data-gift="tea">${this.gameProgress.tea ? '✅' : '🔒'}</span>
+                </div>
+                <div class="gift-item">
+                    <span class="status" data-gift="window">${this.gameProgress.window ? '✅' : '🔒'}</span>
+                </div>
+            `;
+        }
     }
 
     checkAllGamesCompleted() {
         const allCompleted = Object.values(this.gameProgress).every(completed => completed);
         
         if (allCompleted) {
-            // Проверяем, не запущена ли уже финальная игра
-            if (!this.finalGameStarted) {
-                // Через 2 секунды запускаем финальную игру
-                setTimeout(() => {
-                    this.showMessage('🎉 Поздравляю! Все игры пройдены! 🎉');
-                    setTimeout(() => {
-                        this.startFinalGame();
-                    }, 2000);
-                }, 1000);
-            }
+            // Обновляем отображение
+            this.updateProgressDisplay();
         }
     }
 

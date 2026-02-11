@@ -24,29 +24,19 @@
             <!-- Карта прогресса -->
             <div class="progress-map">
                 <div class="gift-item">
-                    <span class="gift-icon">🖼️</span>
-                    <span class="gift-name">Картина</span>
-                    <span class="status" data-gift="picture">🔒</span>
+                    <span class="status" data-gift="picture">${this.gameProgress.picture ? '✅' : '🔒'}</span>
                 </div>
                 <div class="gift-item">
-                    <span class="gift-icon">🏮</span>
-                    <span class="gift-name">Фонарик</span>
-                    <span class="status" data-gift="lantern">🔒</span>
+                    <span class="status" data-gift="lantern">${this.gameProgress.lantern ? '✅' : '🔒'}</span>
                 </div>
                 <div class="gift-item">
-                    <span class="gift-icon">🔋</span>
-                    <span class="gift-name">Часы</span>
-                    <span class="status" data-gift="watch">🔒</span>
+                    <span class="status" data-gift="watch">${this.gameProgress.watch ? '✅' : '🔒'}</span>
                 </div>
                 <div class="gift-item">
-                    <span class="gift-icon">🍵</span>
-                    <span class="gift-name">Чай</span>
-                    <span class="status" data-gift="tea">🔒</span>
+                    <span class="status" data-gift="tea">${this.gameProgress.tea ? '✅' : '🔒'}</span>
                 </div>
                 <div class="gift-item">
-                    <span class="gift-icon">🪟</span>
-                    <span class="gift-name">Окно</span>
-                    <span class="status" data-gift="window">🔒</span>
+                    <span class="status" data-gift="window">${this.gameProgress.window ? '✅' : '🔒'}</span>
                 </div>
             </div>
         </div>
