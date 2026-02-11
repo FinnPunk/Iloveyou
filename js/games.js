@@ -309,7 +309,7 @@ class GameLogic {
                 <line x1="70" y1="20" x2="70" y2="120"/>
                 <line x1="80" y1="20" x2="80" y2="120"/>
                 <line x1="90" y1="20" x2="90" y2="120"/>
-                <line x1="100" y1="20" x2="100" y2="120"/>
+                <line x="100" y1="20" x2="100" y2="120"/>
               </g>
               
               <!-- Золотая нижняя часть (узор) -->
@@ -624,39 +624,49 @@ class GameLogic {
         
         let petals = 10;
         let removedCount = 0;
+        let currentMessage = "любит";
+        let firstClick = true; // флаг для первого клика
         
-        // Создаём лепестки по кругу (как на нормальных цветках)
-        const centerX = 100;
+        // Параметры цветка (как на фото)
+        const centerX = 100;   // центр цветка
         const centerY = 100;
-        const radius = 80; // расстояние от центра до основания лепестка
-        
+        const radius = 50;    // расстояние от центра до основания лепестка
+        const petalLength = 40; // длина лепестка от основания до кончика
+
+        // Создаём 10 лепестков по окружности (как на фото)
         for (let i = 0; i < petals; i++) {
-            const angle = (i / petals) * 2 * Math.PI; // равномерное распределение
-            const baseX = centerX + radius * Math.cos(angle); // основание лепестка у цветка
+            const angle = (i / petals) * 2 * Math.PI; // угол в радианах (0, 36°, 72°, ...)
+            
+            // Координаты основания лепестка (прикреплены к центру)
+            const baseX = centerX + radius * Math.cos(angle);
             const baseY = centerY + radius * Math.sin(angle);
-            const tipX = centerX + (radius + 60) * Math.cos(angle); // кончик лепестка дальше
-            const tipY = centerY + (radius + 60) * Math.sin(angle);
+            
+            // Координаты кончика лепестка (внешний край)
+            const tipX = centerX + (radius + petalLength) * Math.cos(angle);
+            const tipY = centerY + (radius + petalLength) * Math.sin(angle);
             
             // Создаём SVG-элемент лепестка
             const petal = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            petal.setAttribute('width', '60');
-            petal.setAttribute('height', '120');
-            petal.setAttribute('viewBox', '0 0 60 120');
+            petal.setAttribute('width', '80');
+            petal.setAttribute('height', '80');
+            petal.setAttribute('viewBox', '0 0 80 80');
             petal.setAttribute('class', 'petal');
             petal.style.position = 'absolute';
-            petal.style.left = baseX - 30 + 'px';
-            petal.style.top = baseY - 60 + 'px';
+            petal.style.left = (baseX - 40) + 'px'; // центрируем относительно основания
+            petal.style.top = (baseY - 40) + 'px';
             petal.style.cursor = 'pointer';
             petal.style.transform = `rotate(${angle * 180 / Math.PI}deg)`; // поворачиваем лепесток
-            petal.style.transformOrigin = '30px 60px'; // вращаем относительно центра лепестка
+            petal.style.transformOrigin = '40px 40px'; // вращаем вокруг центра лепестка
             
-            // Вставляем точный SVG-код лепестка (ориентирован правильно)
+            // SVG-путь для каплевидного лепестка (как на фото)
+            const pathData = `
+                M 40 40 
+                C 50 20, 60 10, 70 30 
+                C 60 50, 50 60, 40 40
+            `;
+            
             petal.innerHTML = `
-              <path d="
-                M 30 60 
-                C 45 30, 55 0, 30 0 
-                C 5 0, 15 30, 30 60
-              " fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+                <path d="${pathData}" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
             `;
 
             petal.addEventListener('click', () => {
@@ -665,16 +675,36 @@ class GameLogic {
                     removedCount++;
                     petalsLeftElement.textContent = petals - removedCount;
                     
+                    // Показываем текущее сообщение
+                    resultMessage.style.display = 'block';
+                    resultMessage.style.color = '#e74c3c';
+                    resultMessage.innerHTML = `<strong>${currentMessage.toUpperCase()}!</strong>`;
+                    
+                    // Меняем сообщение на следующий клик
+                    if (firstClick) {
+                        currentMessage = "не любит";
+                        firstClick = false;
+                    } else {
+                        currentMessage = currentMessage === "любит" ? "не любит" : "любит";
+                    }
+                    
                     if (removedCount >= petals) {
+                        // Показываем финальное сообщение
+                        setTimeout(() => {
+                            resultMessage.innerHTML = 'НЕ ЛЮБИТ!<br><span style="font-size: 1rem; color: #27ae60;">(это не правда, ведь это просто игра, а в жизни как раз всё реально. Он любит тебя очень-очень!)</span>';
+                            this.showFinalMessage();
+                        }, 1000);
+                        
                         // Убираем обработчики, чтобы не вызывались лишние разы
                         const allPetals = document.querySelectorAll('.petal');
                         allPetals.forEach(p => {
                             p.removeEventListener('click', arguments.callee);
                         });
-                        
+                    } else {
+                        // Скрываем сообщение через 1.5 секунды
                         setTimeout(() => {
-                            this.showFinalMessage();
-                        }, 500);
+                            resultMessage.style.display = 'none';
+                        }, 1500);
                     }
                 }
             });
@@ -689,8 +719,8 @@ class GameLogic {
         
         // Показываем результат
         resultMessage.style.display = 'block';
-        resultMessage.style.color = '#e74c3c';
-        resultMessage.innerHTML = 'ЛЮБИТ! ❤️<br><span style="font-size: 1rem;">(и даже больше, чем ты думаешь)</span>';
+        resultMessage.style.color = '#27ae60';
+        resultMessage.innerHTML = 'ОН ЛЮБИТ ТЕБЯ ОЧЕНЬ-ОЧЕНЬ!<br><span style="font-size: 1rem;">(и даже больше, чем ты думаешь)</span>';
         
         // Анимация появления результата
         resultMessage.style.animation = 'pulse 0.5s ease';
